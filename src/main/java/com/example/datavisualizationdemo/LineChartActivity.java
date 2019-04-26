@@ -24,26 +24,28 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+//draw the line chart on this activity when the "Get data" button is tapped
 public class LineChartActivity extends AppCompatActivity {
 
     TextView progressTextView;
     TextView data;
     Map<Integer, Float> map = new LinkedHashMap<>();
     LineChart lineChart;
-    ArrayList<Entry>  entries = new ArrayList<>();
-    //ArrayList<String> ids = new ArrayList<>();
-
+    static ArrayList<Entry>  entries;
+    static int i;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_linechart);
+        entries = new ArrayList<>();
+        i = 0;
 
         Resources res = getResources();
         progressTextView = (TextView) findViewById(R.id.progressTextView);
         data = (TextView) findViewById(R.id.data);
 
-        progressTextView.setText("");
+        progressTextView.setText("");//implement the "Get data button"
         Button btn = (Button) findViewById(R.id.getDataButton);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,7 +59,7 @@ public class LineChartActivity extends AppCompatActivity {
 
 
     }
-
+    //connect to DB and get sql response then parse the data
     private class GetData extends AsyncTask<String, String, String>{
 
         String msg = "";
@@ -76,33 +78,37 @@ public class LineChartActivity extends AppCompatActivity {
             Statement stmt = null;
             try{
                 Class.forName(JDBC_DRIVER).newInstance();
-                ///////////
+
+                ///////////setup connection
                 conn = DriverManager.getConnection(URL, DbStrings.USERNAME, DbStrings.PASSWORD);
                 ///////////
+
                 stmt = conn.createStatement();
                 Intent in = getIntent();
-                //if(in.getIntArrayExtra("checkedList") == null)
+
+                //get extra data passed from last activity, this data includes index number
                 final int index = in.getIntExtra("com.example.datavisualizationdemo.PIC_INDEX", -1);
                 String sql = "select * from Sensor.SensorData where SensorId = " + String.valueOf(index) + ";";
-                ResultSet rs = stmt.executeQuery(sql);
-                int i = 0;
+                ResultSet rs = stmt.executeQuery(sql);//send sql command
+                i = 0;
                 while(rs.next()){
-                    //Integer id = rs.getInt("Id");
-                    float quantity = rs.getFloat("Quantity");
-                    map.put(i, quantity);
-                    entries.add(new Entry(i, quantity));
+                    float quantity = rs.getFloat("Quantity"); //parse the quantity
+                    map.put(i, quantity); //this map is used to check empty
+                    entries.add(new Entry(i, quantity));//entries used to draw line chart
                     i++;
                 }
+                //darawing the line chart
                 LineDataSet data = new LineDataSet(entries, "Quantity");
                 LineData lineData = new LineData(data);
                 lineChart.setData(lineData);
                 lineChart.invalidate();
                 msg = "Process complete.";
+                //terminate this connection
                 rs.close();
                 stmt.close();
                 conn.close();
 
-            }catch(SQLException connError){
+            }catch(SQLException connError){//error checks
                 msg = connError.toString();
                 connError.printStackTrace();
             } catch (ClassNotFoundException e) {
@@ -136,7 +142,7 @@ public class LineChartActivity extends AppCompatActivity {
 
             progressTextView.setText(this.msg);
 
-            if(map.size() > 0){
+            if(map.size() > 0){//check whether the data we wanted exists
                 data.setText("Success");
             }else{
                 data.setText("Failed");

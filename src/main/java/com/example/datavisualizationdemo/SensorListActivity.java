@@ -12,7 +12,7 @@ import android.widget.CheckBox;
 import android.widget.ListView;
 
 import java.util.ArrayList;
-
+//implement the sensor list activity
 public class SensorListActivity extends AppCompatActivity {
 
     ListView sensorListView;
@@ -26,8 +26,7 @@ public class SensorListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sensor_list);
 
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        //fields
         Resources res = getResources();
         sensorListView = (ListView) findViewById(R.id.sensorListView);
         sensors = res.getStringArray(R.array.sensors);

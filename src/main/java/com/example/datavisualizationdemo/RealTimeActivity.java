@@ -31,13 +31,14 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+//get real-time data from the MQTT broker and draw them using a line chart
 public class RealTimeActivity extends AppCompatActivity {
 
     TextView dataReceived;
     Button dataBtn;
     EditText input;
-    MqttAndroidClient subClient;
-    MqttAndroidClient pubClient;
+    MqttAndroidClient subClient;//the subscribe client
+    MqttAndroidClient pubClient;//the publish client
     static int i = 0;
 
     LineChart realLineChart;
@@ -53,7 +54,7 @@ public class RealTimeActivity extends AppCompatActivity {
         dataBtn = (Button) findViewById(R.id.dataBtn);
         input = (EditText) findViewById(R.id.quantity);
 
-        ///////////////////////////////////////////////////////connect
+        //---------------------------------------------------------------connect the buyer account with subscribe client
 
         String clientId1 = MqttClient.generateClientId();
         subClient = new MqttAndroidClient(this.getApplicationContext(), "tcp://18.217.227.236:1883",
@@ -80,7 +81,7 @@ public class RealTimeActivity extends AppCompatActivity {
             ex.printStackTrace();
         }
 
-        //------------------------------------------------
+        //---------------------------------------------------------------connect the seller account with publish publish client
 
         String clientId2 = MqttClient.generateClientId();
         pubClient = new MqttAndroidClient(this.getApplicationContext(), "tcp://18.217.227.236:1883",
@@ -106,7 +107,7 @@ public class RealTimeActivity extends AppCompatActivity {
             ex.printStackTrace();
         }
 
-        //////////////////////////////////////////////////////////publish
+        //---------------------------------------------------------------publish to broker using the dataBtn button
 
         dataBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -125,7 +126,7 @@ public class RealTimeActivity extends AppCompatActivity {
             }
         });
 
-        //////////////////////////////////////////////////////////////subscribe
+        //---------------------------------------------------------------subscribe from the broker
         subClient.setCallback(new MqttCallback() {
             @Override
             public void connectionLost(Throwable cause) {

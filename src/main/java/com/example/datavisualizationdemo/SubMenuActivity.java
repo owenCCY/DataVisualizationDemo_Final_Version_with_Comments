@@ -14,6 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+//implement submenu activity
 public class SubMenuActivity extends AppCompatActivity {
 
     double lat;
@@ -59,62 +60,66 @@ public class SubMenuActivity extends AppCompatActivity {
         });
 
     }
-        public class GetData extends AsyncTask<String, String, String> {
 
-            static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+    //get geo-data from DB in advance, prepare for showing the map activity
+    public class GetData extends AsyncTask<String, String, String> {
 
-            @Override
-            protected String doInBackground(String... strings) {
+        static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
 
-                Connection conn = null;
-                Statement stmt = null;
-                try{
-                    Class.forName(JDBC_DRIVER).newInstance();
-                    ///////////
-                    conn = DriverManager.getConnection("jdbc:mysql://10.0.2.2:3306/Sensor", DbStrings.USERNAME, DbStrings.PASSWORD);
-                    ///////////
-                    stmt = conn.createStatement();
-                    Intent in = getIntent();
-                    String sql = "select * from Sensor.SensorLoc where id = " + String.valueOf(index+1) + ";";
-                    ResultSet rs = stmt.executeQuery(sql);
-                    while(rs.next()) {
-                        lat = rs.getDouble("lat");
-                        lon = rs.getDouble("lon");
-                    }
-                    rs.close();
-                    stmt.close();
-                    conn.close();
+        @Override
+        protected String doInBackground(String... strings) {
 
-                }catch(SQLException connError){
-                    connError.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                } finally {
-                    try{
-                        if(stmt != null) {
-                            stmt.close();
-                        }
-                    }catch(SQLException e){
-                        e.printStackTrace();
-                    }
-                    try{
-                        if(conn != null) {
-                            conn.close();
-                        }
-                    }catch(SQLException e){
-                        e.printStackTrace();
-                    }
+            Connection conn = null;
+            Statement stmt = null;
+            try{
+                Class.forName(JDBC_DRIVER).newInstance();
+
+                ///////////start the connection
+                conn = DriverManager.getConnection("jdbc:mysql://10.0.2.2:3306/Sensor", DbStrings.USERNAME, DbStrings.PASSWORD);
+                ///////////
+
+                stmt = conn.createStatement();
+                Intent in = getIntent();
+                String sql = "select * from Sensor.SensorLoc where id = " + String.valueOf(index+1) + ";";
+                //send the sql commend
+                ResultSet rs = stmt.executeQuery(sql);
+                while(rs.next()) {//parsing the data whenever a new message comes
+                    lat = rs.getDouble("lat");
+                    lon = rs.getDouble("lon");
                 }
-                return null;
-            }
+                //close the connection
+                rs.close();
+                stmt.close();
+                conn.close();
 
+            }catch(SQLException connError){
+                connError.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } finally {
+                try{
+                    if(stmt != null) {
+                        stmt.close();
+                    }
+                }catch(SQLException e){
+                    e.printStackTrace();
+                }
+                try{
+                    if(conn != null) {
+                        conn.close();
+                    }
+                }catch(SQLException e){
+                    e.printStackTrace();
+                }
+            }
+            return null;
         }
 
-
+    }
 
 }
 

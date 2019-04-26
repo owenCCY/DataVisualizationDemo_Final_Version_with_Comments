@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+//build the fields and structure of the sensor list element
 public class SensorAdapter extends BaseAdapter {
 
     LayoutInflater mInflater;
